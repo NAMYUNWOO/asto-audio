@@ -2,13 +2,13 @@
 <html lang="en-us">
   <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0a0805">
+<meta name="theme-color" content="#160c05">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>어스토니시아 사운드 · Astonishia Audio</title>
 <style id="asto-skin">
   @font-face { font-family:'neodgm'; src:url('neodgm.ttf') format('truetype'); font-display:swap; }
-  html, body { margin:0; padding:0; height:100%; background:#0a0805; overflow:hidden;
+  html, body { margin:0; padding:0; height:100%; background:#160c05; overflow:hidden;
     -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;
     -webkit-tap-highlight-color:transparent; }
   h1, footer, .emscripten_border { display:none !important; }
@@ -18,19 +18,26 @@
     margin:0 !important; display:block; outline:none; background:#0a0805;
     object-fit:contain; image-rendering:pixelated; image-rendering:crisp-edges;
   }
+  /* love.js asset-loading screen: full-screen, the title art is drawn onto it */
+  #loadingCanvas {
+    position:fixed !important; inset:0; z-index:1;
+    width:100vw !important; height:100vh !important; height:100dvh !important;
+    margin:0 !important; background:#160c05; object-fit:cover;
+  }
+  /* tap-to-start splash = the title screen + a start button */
   #asto-start {
     position:fixed; inset:0; z-index:50; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; gap:16px; text-align:center;
-    background:radial-gradient(circle at 50% 38%, #241a0e 0%, #0a0805 75%);
+    align-items:center; justify-content:flex-end; gap:12px; text-align:center;
+    padding-bottom:8vh; box-sizing:border-box;
+    background:linear-gradient(rgba(10,6,3,0) 55%, rgba(10,6,3,0.82) 100%),
+               url('asto.webp') center/cover no-repeat #160c05;
     color:#e8d9a8; font-family:'neodgm', monospace;
   }
   #asto-start.hidden { display:none; }
-  #asto-start .title { font-size:clamp(22px,6vw,40px); color:#d8a94a; letter-spacing:2px;
-    text-shadow:0 2px 0 #5a3d12; }
-  #asto-start .sub { font-size:clamp(12px,3.4vw,16px); color:#9a8f78; }
-  #asto-start .btn { margin-top:10px; padding:14px 30px; border:2px solid #b8862f;
-    border-radius:12px; background:#1a140c; color:#f0e4bf; cursor:pointer;
-    font-size:clamp(16px,4.6vw,21px); box-shadow:0 4px 0 #3a2a10; }
+  #asto-start .sub { font-size:clamp(12px,3.4vw,16px); color:#cdbe95; text-shadow:0 1px 2px #000; }
+  #asto-start .btn { padding:14px 30px; border:2px solid #b8862f;
+    border-radius:12px; background:rgba(26,20,12,0.9); color:#f0e4bf; cursor:pointer;
+    font-size:clamp(16px,4.6vw,21px); box-shadow:0 4px 0 #3a2a10; font-family:'neodgm', monospace; }
   #asto-start .btn:active { transform:translateY(2px); box-shadow:0 2px 0 #3a2a10; }
 </style>
 
@@ -142,13 +149,39 @@
     </footer>
   
 <div id="asto-start">
-  <div class="title">어스토니시아 사운드</div>
-  <div class="sub">Astonishia Story &middot; BGM Player</div>
   <button class="btn" id="asto-start-btn">&#9654; 탭하여 시작 / Tap to start</button>
   <div class="sub">PC: &uarr;&darr; Enter / Space &middot; 모바일: 터치로 선택&middot;재생</div>
 </div>
 <script>
 (function () {
+  // Draw the Astonishia title art on the love.js asset-loading canvas instead of
+  // the default "Powered By LÖVE" image. drawLoadingText/loadingContext are the
+  // globals defined by the love.js template; reassigning is honored by setStatus.
+  var titleImg = new Image();
+  titleImg.src = 'asto.webp';
+  window.drawLoadingText = function (text) {
+    try {
+      var ctx = loadingContext, cv = ctx.canvas;
+      ctx.fillStyle = '#160c05';
+      ctx.fillRect(0, 0, cv.width, cv.height);
+      if (titleImg.complete && titleImg.naturalWidth) {
+        var s = Math.max(cv.width / titleImg.naturalWidth, cv.height / titleImg.naturalHeight);
+        var w = titleImg.naturalWidth * s, h = titleImg.naturalHeight * s;
+        ctx.drawImage(titleImg, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+      }
+      ctx.font = '1.3em "neodgm", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(0, cv.height - 46, cv.width, 46);
+      ctx.fillStyle = '#f0d9a0';
+      ctx.fillText(text || '로딩중...', cv.width / 2, cv.height - 16);
+      window.__astoLastText = text;
+    } catch (e) {}
+  };
+  titleImg.onload = function () {
+    if (typeof window.__astoLastText !== 'undefined') window.drawLoadingText(window.__astoLastText);
+  };
+
   var ov = document.getElementById('asto-start');
   function start() { if (ov) ov.classList.add('hidden'); }
   var btn = document.getElementById('asto-start-btn');
