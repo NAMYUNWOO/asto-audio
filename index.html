@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>어스토니시아 사운드 · Astonishia Audio</title>
 <style id="asto-skin">
+  @font-face { font-family:'neodgm'; src:url('neodgm.ttf') format('truetype'); font-display:swap; }
   html, body { margin:0; padding:0; height:100%; background:#0a0805; overflow:hidden;
     -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;
     -webkit-tap-highlight-color:transparent; }
@@ -21,7 +22,7 @@
     position:fixed; inset:0; z-index:50; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:16px; text-align:center;
     background:radial-gradient(circle at 50% 38%, #241a0e 0%, #0a0805 75%);
-    color:#e8d9a8; font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+    color:#e8d9a8; font-family:'neodgm', monospace;
   }
   #asto-start.hidden { display:none; }
   #asto-start .title { font-size:clamp(22px,6vw,40px); color:#d8a94a; letter-spacing:2px;
